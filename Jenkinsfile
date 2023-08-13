@@ -3,7 +3,6 @@ pipeline {
     }
 
     stages {
-
         stage('Deploy on Kubernetes') {
             steps {
                 script {
@@ -14,4 +13,3 @@ pipeline {
             }
         }
     }
-}
