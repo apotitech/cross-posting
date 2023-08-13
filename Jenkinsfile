@@ -55,7 +55,7 @@ pipeline {
             sh 'docker rmi $DOCKER_HUB_USERNAME/$DOCKER_IMAGE_NAME:latest'
             sh 'kubectl get all'
             // Optionally, you can delete the cluster after deployment
-            sh "kops delete cluster --name=$KOPS_CLUSTER_NAME --state=$KOPS_STATE_STORE --yes"
+            #sh "kops delete cluster --name=$KOPS_CLUSTER_NAME --state=$KOPS_STATE_STORE --yes"
         }
     }
 }
