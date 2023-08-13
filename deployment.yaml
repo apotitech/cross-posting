@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: simple-app
-        image: apotieri/app_maven_001
+        image: apotieri/CompleteCICD
         resources:
           limits:
             memory: "256Mi"
