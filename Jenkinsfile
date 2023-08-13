@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_HUB_USERNAME = 'apotieri'
-        DOCKER_IMAGE_NAME = 'CompleteCICD'
+        DOCKER_IMAGE_NAME = 'completecicd'
         KOPS_CLUSTER_NAME = 'apotiankops7.k8s.local'
         KOPS_STATE_STORE = 's3://apotiankops7.k8s.local'
         DEPLOYMENT_FILE_PATH = 'deployment.yaml' // path to your deployment file in the repo
