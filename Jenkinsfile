@@ -22,7 +22,7 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerID', passwordVariable: 'PWD', usernameVariable: 'USER')]) {
                    sh "docker login -u ${USER} -p ${PWD}"
-                   sh "docker push apotieri/app_maven_001"
+                   sh "docker push $DOCKER_HUB_USERNAME/$DOCKER_IMAGE_NAME"
                     }                    
             }
         }
