@@ -13,9 +13,9 @@ pipeline {
         stage('INSTALL HELM') {
             steps {
                 script {
-                    sh 'curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3'
-                    sh 'chmod +x get_helm.sh'
-                    sh './get_helm.sh'
+                    sh 'curl -fsSL -o get_helm1.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3'
+                    sh 'sudo chmod +x get_helm1.sh'
+                    sh 'sudo ./get_helm1.sh'
                 }
             }
         }
