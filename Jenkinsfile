@@ -10,45 +10,55 @@ pipeline {
     }
 
     stages {
-        stage('Build Docker Image') {
+        stage('INSTALL HELM') {
             steps {
                 script {
-                    //sh 'docker build -t $DOCKER_HUB_USERNAME/$DOCKER_IMAGE_NAME:latest .'
-                    sh "kops delete cluster --name=$KOPS_CLUSTER_NAME --state=$KOPS_STATE_STORE --yes"
+                    sh 'curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3'
+                    sh 'chmod +x get_helm.sh'
+                    sh './get_helm.sh'
                 }
             }
         }
 
-        // stage('DOCKER PUSH') {
-        //     steps {
-        //         withCredentials([usernamePassword(credentialsId: 'dockerID', passwordVariable: 'PWD', usernameVariable: 'USER')]) {
-        //            sh "docker login -u ${USER} -p ${PWD}"
-        //            sh "docker push $DOCKER_HUB_USERNAME/$DOCKER_IMAGE_NAME"
-        //             }                    
-        //     }
-        // }
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    sh 'docker build -t $DOCKER_HUB_USERNAME/$DOCKER_IMAGE_NAME:latest .'
+                }
+            }
+        }
 
-        // stage('Create Kops Cluster') {
-        //     steps {
-        //         script {
-        //             sh """
-        //                 kops create cluster --zones us-east-1a --master-size t2.medium --master-count 1 --node-size t2.medium --node-count=2 --name=$KOPS_CLUSTER_NAME --state=$KOPS_STATE_STORE --yes
-        //                 kops update cluster --name=$KOPS_CLUSTER_NAME --state=$KOPS_STATE_STORE --yes
-        //                 kops validate cluster --wait 10m
-        //             """
-        //         }
-        //     }
-        // }
+        stage('DOCKER PUSH') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerID', passwordVariable: 'PWD', usernameVariable: 'USER')]) {
+                   sh "docker login -u ${USER} -p ${PWD}"
+                   sh "docker push $DOCKER_HUB_USERNAME/$DOCKER_IMAGE_NAME"
+                    }                    
+            }
+        }
 
-        // stage('Deploy on Kubernetes') {
-        //     steps {
-        //         script {
-        //             sh """
-        //                 kubectl apply -f $DEPLOYMENT_FILE_PATH
-        //             """
-        //         }
-        //     }
-        // }
+        stage('Create Kops Cluster') {
+            steps {
+                script {
+                    sh """
+                        kops create cluster --zones us-east-1a --master-size t2.medium --master-count 1 --node-size t2.medium --node-count=2 --name=$KOPS_CLUSTER_NAME --state=$KOPS_STATE_STORE --yes
+                        kops update cluster --name=$KOPS_CLUSTER_NAME --state=$KOPS_STATE_STORE --yes
+                        kops validate cluster --wait 10m
+                    """
+                }
+            }
+        }
+
+        stage('Deploy on Kubernetes') {
+            steps {
+                script {
+                    sh """
+                        helm create sunday-class-cicd
+                        helm install sunday-class-cicd sunday-class-cicd
+                    """
+                }
+            }
+        }
     }
 
     post {
@@ -57,6 +67,7 @@ pipeline {
             sh 'kubectl get all'
             // Optionally, you can delete the cluster after deployment
             //sh "kops delete cluster --name=$KOPS_CLUSTER_NAME --state=$KOPS_STATE_STORE --yes"
+            // kubectl apply -f $DEPLOYMENT_FILE_PATH
         }
     }
 }
