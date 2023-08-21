@@ -10,17 +10,6 @@ pipeline {
     }
 
     stages {
-        stage('INSTALL HELM') {
-            steps {
-                script {
-                    sh 'touch ~/.sudo_as_admin_successful'
-                    sh 'curl -fsSL -o get_helm1.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3'
-                    sh 'chmod +x get_helm1.sh'
-                    sh 'bash ./get_helm1.sh'
-                }
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
                 script {
