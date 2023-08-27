@@ -59,6 +59,7 @@ pipeline {
                     reportFiles: 'trivy_dockerhub_report.html',
                     reportName: 'Trivy Scan',
                 ])
+            }
         }
     }
 }
