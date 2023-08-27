@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         DOCKER_HUB_USERNAME = 'apotieri'
-        DOCKER_IMAGE_NAME = 'trivy_scanned_http'
+        DOCKER_IMAGE_NAME = 'trivy_scanned_image'
         TRIVY_TEMPLATE_PATH = "/home/jenkins/trivy_template.tpl"
     }
     stages {
@@ -31,7 +31,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'dockerID', passwordVariable: 'PWD', usernameVariable: 'USER')]) {
                     script {
                         sh "docker login -u ${USER} -p ${PWD}"
-                        """trivy image --format template --template "@${env.TRIVY_TEMPLATE_PATH}" --output trivy_local_report.html ${env.DOCKER_HUB_USERNAME}/${env.DOCKER_IMAGE_NAME}"""
+                        """trivy image --format template --template "@${env.TRIVY_TEMPLATE_PATH}" --output trivy_dockerhub_report.html ${env.DOCKER_HUB_USERNAME}/${env.DOCKER_IMAGE_NAME}"""
                         sh "docker logout"
                     }
                 }
