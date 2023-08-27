@@ -7,13 +7,7 @@ RUN npm install lodash@4.17.10
 # Set the working directory
 WORKDIR /usr/src/app
 
-# Copy the package.json and package-lock.json
-COPY package*.json ./
-
 # Install application dependencies
 RUN npm install
-
-# Bundle app source
-COPY . .
 
 CMD [ "node", "sunday-app.js" ]
