@@ -4,6 +4,7 @@ pipeline {
         DOCKER_HUB_USERNAME = 'apotieri'
         DOCKER_IMAGE_NAME = 'trivy_scanned_image'
         TRIVY_TEMPLATE_PATH = "/home/jenkins/trivy_template.tpl"
+        DATE = date
     }
     stages {
         stage('Build Docker Image') {
@@ -59,7 +60,7 @@ pipeline {
                 keepAll: true,
                 reportDir: '.',
                 reportFiles: 'trivy_dockerhub_report.html',
-                reportName: 'Trivy Scan',
+                reportName: 'Trivy Scan - $DATE',
             ])
         }
     }
