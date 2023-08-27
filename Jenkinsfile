@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         DOCKER_HUB_USERNAME = 'apotieri'
-        DOCKER_IMAGE_NAME = 'trivy_scanned_image'
+        DOCKER_IMAGE_NAME = 'trivy_scanned_http'
         TRIVY_TEMPLATE_PATH = "/home/jenkins/trivy_template.tpl"
     }
     stages {
