@@ -2,8 +2,8 @@ pipeline {
     agent any
     environment {
         DOCKER_HUB_USERNAME = 'apotieri'
-        DOCKER_IMAGE_NAME = 'Trivy_Scanned_Image'
-        TRIVY_TEMPLATE_PATH = "/path/to/your/template/html.tpl"
+        DOCKER_IMAGE_NAME = 'trivy_scanned_image'
+        TRIVY_TEMPLATE_PATH = "/home/jenkins/trivy_template.tpl"
     }
     stages {
         stage('Build Docker Image') {
