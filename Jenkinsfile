@@ -28,9 +28,9 @@ pipeline {
         }
         stage('Trivy Scan DockerHub Image') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerID', passwordVariable: 'PWD', usernameVariable: 'USER')]) {
+                withCredentials([usernamePassword(credentialsId: 'dockerID', passwordVariable: 'DOCKER_PWD', usernameVariable: 'DOCKER_USER')]) {
                     script {
-                        sh 'docker login -u $USER -p $PWD'
+                        sh 'docker login -u $DOCKER_USER -p $DOCKER_PWD'
                         sh """trivy image --format template --template "@${env.TRIVY_TEMPLATE_PATH}" --output trivy_dockerhub_report.html ${env.DOCKER_HUB_USERNAME}/${env.DOCKER_IMAGE_NAME}"""
                         sh 'docker logout'
                     }
