@@ -20,6 +20,7 @@ pipeline {
                     def trivyExitCode = sh(script: "trivy image --format template --template \"@${env.TRIVY_TEMPLATE_PATH}\" --output trivy_local_report.html ${env.DOCKER_HUB_USERNAME}/${env.DOCKER_IMAGE_NAME}", returnStatus: true)
                     if (trivyExitCode != 0) {
                         error("Trivy detected vulnerabilities in the image!")
+                    }
                 }
             }
             post {
@@ -28,6 +29,7 @@ pipeline {
                 }
             }
         }
+
         stage('Trivy Scan DockerHub Image') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerID', passwordVariable: 'DOCKER_PWD', usernameVariable: 'DOCKER_USER')]) {
@@ -37,29 +39,28 @@ pipeline {
                         sh 'docker logout'
                         if (trivyExitCode != 0) {
                             error("Trivy detected vulnerabilities in the image!")
+                        }
                     }
                 }
             }
             post {
                 always {
                     archiveArtifacts artifacts: 'trivy_dockerhub_report.html', allowEmptyArchive: true
-                    }
+                }
             }
         }
     }
-        post {
-            always {
-                archiveArtifacts artifacts: "trivy_dockerhub_report.html", fingerprint: true
-                        
-                publishHTML (target: [
-                    allowMissing: false,
-                    alwaysLinkToLastBuild: false,
-                    keepAll: true,
-                    reportDir: '.',
-                    reportFiles: 'trivy_dockerhub_report.html',
-                    reportName: 'Trivy Scan',
-                ])
-            }
+    post {
+        always {
+            archiveArtifacts artifacts: "trivy_dockerhub_report.html", fingerprint: true
+            publishHTML (target: [
+                allowMissing: false,
+                alwaysLinkToLastBuild: false,
+                keepAll: true,
+                reportDir: '.',
+                reportFiles: 'trivy_dockerhub_report.html',
+                reportName: 'Trivy Scan',
+            ])
         }
     }
 }
