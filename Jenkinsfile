@@ -17,7 +17,9 @@ pipeline {
         stage('Trivy Scan Local Image') {
             steps {
                 script {
-                    sh """trivy image --format template --template "@${env.TRIVY_TEMPLATE_PATH}" --output trivy_local_report.html ${env.DOCKER_HUB_USERNAME}/${env.DOCKER_IMAGE_NAME}"""
+                    def trivyExitCode = sh(script: "trivy image --format template --template \"@${env.TRIVY_TEMPLATE_PATH}\" --output trivy_local_report.html ${env.DOCKER_HUB_USERNAME}/${env.DOCKER_IMAGE_NAME}", returnStatus: true)
+                    if (trivyExitCode != 0) {
+                        error("Trivy detected vulnerabilities in the image!")
                 }
             }
             post {
@@ -31,8 +33,10 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'dockerID', passwordVariable: 'DOCKER_PWD', usernameVariable: 'DOCKER_USER')]) {
                     script {
                         sh 'docker login -u $DOCKER_USER -p $DOCKER_PWD'
-                        sh """trivy image --format template --template "@${env.TRIVY_TEMPLATE_PATH}" --output trivy_dockerhub_report.html ${env.DOCKER_HUB_USERNAME}/${env.DOCKER_IMAGE_NAME}"""
+                        def trivyExitCode = sh(script: "trivy image --format template --template \"@${env.TRIVY_TEMPLATE_PATH}\" --output trivy_dockerhub_report.html ${env.DOCKER_HUB_USERNAME}/${env.DOCKER_IMAGE_NAME}", returnStatus: true)
                         sh 'docker logout'
+                        if (trivyExitCode != 0) {
+                            error("Trivy detected vulnerabilities in the image!")
                     }
                 }
             }
