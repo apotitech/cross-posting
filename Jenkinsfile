@@ -1,0 +1,60 @@
+pipeline {
+    agent any
+    environment {
+        DOCKER_HUB_USERNAME = 'apotieri'
+        DOCKER_IMAGE_NAME = 'Trivy_Scanned_Image'
+        TRIVY_TEMPLATE_PATH = "/path/to/your/template/html.tpl"
+    }
+    stages {
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    sh 'docker build -t $DOCKER_HUB_USERNAME/$DOCKER_IMAGE_NAME .'
+                }
+            }
+        }
+
+        stage('Trivy Scan Local Image') {
+            steps {
+                script {
+                    sh """trivy image --format template --template "@${env.TRIVY_TEMPLATE_PATH}" --output trivy_local_report.html ${env.DOCKER_HUB_USERNAME}/${env.DOCKER_IMAGE_NAME}"""
+                }
+            }
+            post {
+                always {
+                    archiveArtifacts artifacts: 'trivy_local_report.html', allowEmptyArchive: true
+                }
+            }
+        }
+        stage('Trivy Scan DockerHub Image') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerID', passwordVariable: 'PWD', usernameVariable: 'USER')]) {
+                    script {
+                        sh "docker login -u ${USER} -p ${PWD}"
+                        """trivy image --format template --template "@${env.TRIVY_TEMPLATE_PATH}" --output trivy_local_report.html ${env.DOCKER_HUB_USERNAME}/${env.DOCKER_IMAGE_NAME}"""
+                        sh "docker logout"
+                    }
+                }
+            }
+            post {
+                always {
+                    archiveArtifacts artifacts: 'trivy_dockerhub_report.html', allowEmptyArchive: true
+                    }
+            }
+        }
+    }
+        post {
+            always {
+                archiveArtifacts artifacts: "trivy_dockerhub_report.html", fingerprint: true
+                        
+                publishHTML (target: [
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: false,
+                    keepAll: true,
+                    reportDir: '.',
+                    reportFiles: 'trivy_dockerhub_report.html',
+                    reportName: 'Trivy Scan',
+                ])
+        }
+    }
+}
