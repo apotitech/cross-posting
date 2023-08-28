@@ -7,7 +7,7 @@ pipeline {
         DATE = sh 'date'
     }
     stages {
-        stage('Build Docker Image') {
+        stage('Build DOCKER Image') {
             steps {
                 script {
                     sh 'docker build -t $DOCKER_HUB_USERNAME/$DOCKER_IMAGE_NAME .'
