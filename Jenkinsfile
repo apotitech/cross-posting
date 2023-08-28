@@ -15,7 +15,7 @@ pipeline {
             }
         }
 
-        stage('Trivy Scan Local Image') {
+        stage('Trivy SCAN Local Image') {
             steps {
                 script {
                     def trivyExitCode = sh(script: "trivy image --format template --template \"@${env.TRIVY_TEMPLATE_PATH}\" --output trivy_local_report.html ${env.DOCKER_HUB_USERNAME}/${env.DOCKER_IMAGE_NAME}", returnStatus: true)
